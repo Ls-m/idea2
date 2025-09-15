@@ -1,0 +1,74 @@
+# Configuration for Respiratory Rate Estimation
+
+# Data settings
+data:
+  data_dir: "data"
+  fs: 125  # Sampling frequency
+  window_size: 30  # seconds
+  overlap: 0.5  # 50% overlap
+  n_subjects: 53
+  test_ratio: 0.2
+  val_ratio: 0.2
+
+# Model settings
+model:
+  time_branch:
+    hidden_size: 256
+    num_layers: 6
+    dropout: 0.2
+  
+  freq_branch:
+    hidden_size: 256
+    num_layers: 4
+    n_fft: 3750  # 30s * 125Hz
+    n_mels: 64
+    dropout: 0.2
+  
+  fusion:
+    hidden_size: 512
+    num_heads: 8
+    dropout: 0.3
+
+# Contrastive learning settings
+contrastive:
+  temperature: 0.07
+  projection_dim: 128
+  augmentation:
+    noise_std: 0.05
+    time_shift_max: 1.0  # seconds
+    amplitude_scale: [0.8, 1.2]
+
+# Training settings
+training:
+  batch_size: 8
+  learning_rate: 1e-4
+  weight_decay: 1e-5
+  max_epochs: 1
+  patience: 15
+  min_delta: 0.001
+  
+  # Two-stage training
+  contrastive_epochs: 50
+  finetune_epochs: 50
+  
+  # Loss weights
+  contrastive_weight: 1.0
+  regression_weight: 1.0
+
+# Cross-validation settings
+cv:
+  n_folds: 5
+  random_seed: 42
+
+# Logging settings
+logging:
+  project_name: "respiratory_rate_estimation"
+  experiment_name: "dual_branch_rwkv_contrastive"
+  log_every_n_steps: 10
+  save_top_k: 3
+
+# Hardware settings
+hardware:
+  accelerator: "auto"
+  devices: 1
+  precision: 16

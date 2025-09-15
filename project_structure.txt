@@ -1,0 +1,39 @@
+src/
+├── __init__.py
+├── config/
+│   ├── __init__.py
+│   └── config.yaml
+├── data/
+│   ├── __init__.py
+│   ├── dataset.py
+│   ├── datamodule.py
+│   └── preprocessing.py
+├── models/
+│   ├── __init__.py
+│   ├── rwkv.py
+│   ├── frequency_branch.py
+│   ├── contrastive.py
+│   └── dual_branch_model.py
+├── training/
+│   ├── __init__.py
+│   ├── trainer.py
+│   └── callbacks.py
+├── utils/
+│   ├── __init__.py
+│   ├── metrics.py
+│   ├── visualization.py
+│   └── data_utils.py
+└── main.py
+
+notebooks/
+├── data_exploration.ipynb
+└── results_analysis.ipynb
+
+logs/
+└── .gitkeep
+
+checkpoints/
+└── .gitkeep
+
+results/
+└── .gitkeep
