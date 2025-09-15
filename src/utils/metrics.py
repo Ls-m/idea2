@@ -202,6 +202,15 @@ class ContrastiveLossFunction(nn.Module):
             torch.arange(0, batch_size)
         ]).to(z.device)
         
+        # --- DEBUG CHECKS ---
+        if torch.any(pos_indices >= sim_matrix.shape[1]) or torch.any(pos_indices < 0):
+            print(f"[InfoNCE] pos_indices out of bounds! pos_indices: {pos_indices}")
+            print(f"[InfoNCE] sim_matrix shape: {sim_matrix.shape}")
+            raise RuntimeError("InfoNCE: pos_indices out of bounds!")
+        if sim_matrix.shape[0] != 2 * batch_size:
+            print(f"[InfoNCE] sim_matrix shape mismatch: {sim_matrix.shape}, batch_size: {batch_size}")
+            raise RuntimeError("InfoNCE: sim_matrix shape mismatch!")
+        
         # Extract positive similarities
         pos_sim = sim_matrix[torch.arange(2 * batch_size), pos_indices].view(-1, 1)
         
