@@ -111,7 +111,7 @@ class BIDMCDataset(Dataset):
     
     def __getitem__(self, idx: int) -> Dict[str, torch.Tensor]:
         """Get a sample by index."""
-        start = time.time()
+        
         subject_id, window_idx = self.samples[idx]
         data = self.data_cache[subject_id]
         
@@ -146,8 +146,7 @@ class BIDMCDataset(Dataset):
                 'gender': info.get('gender', 'U'),
                 'location': info.get('location', 'unknown')
             })
-        end = time.time()
-        print(f"Data loading time for {subject_id}: {end - start:.4f} seconds")
+        
         return sample
 
 
@@ -229,6 +228,7 @@ class ContrastiveDataset(Dataset):
     
     def __getitem__(self, idx: int) -> Dict[str, torch.Tensor]:
         """Get contrastive sample with two augmented views."""
+        start = time.time()
         subject_id, window_idx = self.samples[idx]
         data = self.data_cache[subject_id]
         
@@ -252,7 +252,8 @@ class ContrastiveDataset(Dataset):
             'subject_id': subject_id,
             'window_idx': window_idx
         }
-        
+        end = time.time()
+        print(f"Data loading time for {subject_id}: {end - start:.4f} seconds")
         return sample
 
 
