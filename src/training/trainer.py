@@ -7,7 +7,7 @@ import torch.optim as optim
 from torch.optim.lr_scheduler import ReduceLROnPlateau, CosineAnnealingLR
 from typing import Dict, Any, Optional, Tuple
 import numpy as np
-
+import time
 from models.dual_branch_model import DualBranchRWKV
 from utils.metrics import RespiratoryRateMetrics, LossFunction, ContrastiveLossFunction, print_metrics
 
@@ -124,6 +124,7 @@ class RespiratoryRateEstimator(pl.LightningModule):
         # Handle different data formats based on training mode
         if self.hparams.training_mode == 'contrastive':
             # Contrastive learning mode - use augmented views
+            start = time.time()
             view1 = batch['view1']
             view2 = batch['view2']
             original = batch['original']
@@ -157,7 +158,9 @@ class RespiratoryRateEstimator(pl.LightningModule):
                 
                 for key, value in regression_losses.items():
                     loss_dict[f'train/supervised_{key}'] = value
-        
+            end = time.time()
+            print(f"Contrastive Training Time: {end - start:.4f} seconds")
+
         else:
             # Supervised learning mode
             ppg_signal = batch['ppg']
