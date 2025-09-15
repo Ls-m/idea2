@@ -381,7 +381,7 @@ def main():
             batch_size=config['training']['batch_size'],
             n_folds=config['cv']['n_folds'],
             current_fold=args.fold,
-            num_workers=4,
+            num_workers=16,
             mode='supervised'
         )
         
