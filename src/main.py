@@ -340,6 +340,7 @@ def run_cross_validation(config: Dict, stage: str = 'both') -> Dict[str, float]:
 
 def main():
     """Main training function."""
+    os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
     parser = argparse.ArgumentParser(description='Train respiratory rate estimation model')
     parser.add_argument('--config', type=str, default='src/config/config.yaml',
                        help='Path to configuration file')
