@@ -181,27 +181,21 @@ class ContrastiveLossFunction(nn.Module):
     def infonce_loss(self, z1: torch.Tensor, z2: torch.Tensor) -> torch.Tensor:
         """InfoNCE loss for contrastive learning."""
         batch_size = z1.shape[0]
-        
         # Normalize features
         z1 = nn.functional.normalize(z1, dim=-1)
         z2 = nn.functional.normalize(z2, dim=-1)
-        
         # Concatenate both views
         z = torch.cat([z1, z2], dim=0)  # (2*batch_size, dim)
-        
         # Compute similarity matrix
         sim_matrix = torch.matmul(z, z.T) / self.temperature
-        
-        # Create positive pairs mask
+        # Remove diagonal
         mask = torch.eye(2 * batch_size, dtype=torch.bool, device=z.device)
         sim_matrix = sim_matrix[~mask].view(2 * batch_size, -1)
-        
-        # Positive pairs are (i, i+batch_size) and (i+batch_size, i)
+        # Compute positive indices after diagonal removal
         pos_indices = torch.cat([
-            torch.arange(batch_size, 2 * batch_size),
-            torch.arange(0, batch_size)
-        ]).to(z.device)
-        
+            torch.full((batch_size,), batch_size - 1, device=z.device),
+            torch.full((batch_size,), batch_size, device=z.device)
+        ])
         # --- DEBUG CHECKS ---
         if torch.any(pos_indices >= sim_matrix.shape[1]) or torch.any(pos_indices < 0):
             print(f"[InfoNCE] pos_indices out of bounds! pos_indices: {pos_indices}")
@@ -210,14 +204,11 @@ class ContrastiveLossFunction(nn.Module):
         if sim_matrix.shape[0] != 2 * batch_size:
             print(f"[InfoNCE] sim_matrix shape mismatch: {sim_matrix.shape}, batch_size: {batch_size}")
             raise RuntimeError("InfoNCE: sim_matrix shape mismatch!")
-        
         # Extract positive similarities
         pos_sim = sim_matrix[torch.arange(2 * batch_size), pos_indices].view(-1, 1)
-        
         # Compute InfoNCE loss
         logits = torch.cat([pos_sim, sim_matrix], dim=1)
         labels = torch.zeros(2 * batch_size, dtype=torch.long, device=z.device)
-        
         loss = nn.functional.cross_entropy(logits, labels)
         return loss
     
