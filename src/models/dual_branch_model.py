@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from typing import Dict, Optional, Tuple
-from .rwkv import RWKV
+from .optimized_rwkv import OptimizedRWKV, create_optimized_rwkv
 from .frequency_branch import FrequencyBranch
 from .contrastive import ContrastiveLearningModule
 
@@ -168,12 +168,13 @@ class DualBranchRWKV(nn.Module):
         self.freq_hidden_size = freq_hidden_size
         self.fusion_hidden_size = fusion_hidden_size
         
-        # Time domain branch
-        self.time_branch = RWKV(
+        # Time domain branch (optimized)
+        self.time_branch = create_optimized_rwkv(
             input_size=1,  # Single channel PPG
             hidden_size=time_hidden_size,
             num_layers=time_num_layers,
-            dropout=dropout
+            dropout=dropout,
+            compile_kernels=True  # Enable CUDA acceleration
         )
         
         # Frequency domain branch

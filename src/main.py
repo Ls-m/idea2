@@ -138,7 +138,7 @@ def train_single_fold(datamodule: BIDMCDataModule,
             learning_rate=float(config['training']['learning_rate']),
             weight_decay=float(config['training']['weight_decay'])
         )
-        
+
         # Train contrastive model
         trainer.fit(model, datamodule)
         
